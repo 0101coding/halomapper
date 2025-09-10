@@ -831,8 +831,8 @@ We welcome contributions! Here's how to get started:
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-username/lightmapper.git
-cd lightmapper
+git clone https://github.com/your-username/halomapper.git
+cd halomapper
 
 # Restore dependencies
 dotnet restore
@@ -847,9 +847,9 @@ dotnet build
 ## Support 💬
 
 - 📖 **Documentation**: [Full documentation](./docs/)
-- 🐛 **Bug Reports**: [GitHub Issues](https://github.com/0101coding/lightmapper/issues)
-- 💡 **Feature Requests**: [GitHub Discussions](https://github.com/0101coding/lightmapper/discussions)
-- ❓ **Questions**: [Stack Overflow](https://stackoverflow.com/questions/tagged/lightmapper)
+- 🐛 **Bug Reports**: [GitHub Issues](https://github.com/0101coding/halomapper/issues)
+- 💡 **Feature Requests**: [GitHub Discussions](https://github.com/0101coding/halomapper/discussions)
+- ❓ **Questions**: [Stack Overflow](https://stackoverflow.com/questions/tagged/halomapper)
 
 ## Roadmap 🗺️
 
