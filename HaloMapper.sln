@@ -9,7 +9,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HaloMapper.Tests", "tests\H
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HaloMapper.Extensions.DependencyInjection", "src\HaloMapper.Extensions.DependencyInjection\HaloMapper.Extensions.DependencyInjection.csproj", "{3F9A2D1E-5B8C-4D6F-A7E9-1C2F5B8D9E0A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LightMapper.Extensions.DependencyInjection.Tests", "tests\LightMapper.Extensions.DependencyInjection.Tests\LightMapper.Extensions.DependencyInjection.Tests.csproj", "{4A0B3E2F-6C9D-5E7A-B8F0-2D3G6C9F0E1B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HaloMapper.Extensions.DependencyInjection.Tests", "tests\HaloMapper.Extensions.DependencyInjection.Tests\HaloMapper.Extensions.DependencyInjection.Tests.csproj", "{4A0B3E2F-6C9D-5E7A-B8F0-2D3G6C9F0E1B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

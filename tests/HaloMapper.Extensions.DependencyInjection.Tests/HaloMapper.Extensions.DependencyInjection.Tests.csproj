@@ -21,8 +21,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="../../src/LightMapper.Extensions.DependencyInjection/LightMapper.Extensions.DependencyInjection.csproj" />
-    <ProjectReference Include="../../src/LightMapper/LightMapper.csproj" />
+    <ProjectReference Include="../../src/HaloMapper.Extensions.DependencyInjection/HaloMapper.Extensions.DependencyInjection.csproj" />
+    <ProjectReference Include="../../src/HaloMapper/HaloMapper.csproj" />
   </ItemGroup>
 
 </Project>

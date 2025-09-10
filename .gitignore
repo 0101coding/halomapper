@@ -418,11 +418,11 @@ $RECYCLE.BIN/
 # *.dll, *.exe, *.pdb are already handled by bin/obj exclusions
 
 tasks
-src/LightMapper/obj/
-src/LightMapper.Extensions.DependencyInjection/obj/
-tests/LightMapper.Extensions.DependencyInjection.Tests/obj/
-tests/LightMapper.Tests/obj/
-src/LightMapper/bin/
-src/LightMapper.Extensions.DependencyInjection/bin/
-tests/LightMapper.Extensions.DependencyInjection.Tests/bin/
-tests/LightMapper.Tests/bin/
+src/HaloMapper/obj/
+src/HaloMapper.Extensions.DependencyInjection/obj/
+tests/HaloMapper.Extensions.DependencyInjection.Tests/obj/
+tests/HaloMapper.Tests/obj/
+src/HaloMapper/bin/
+src/HaloMapper.Extensions.DependencyInjection/bin/
+tests/HaloMapper.Extensions.DependencyInjection.Tests/bin/
+tests/HaloMapper.Tests/bin/
