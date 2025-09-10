@@ -20,9 +20,9 @@
 
   <!-- Common package metadata -->
   <PropertyGroup>
-    <Authors>LightMapper Contributors</Authors>
-    <Company>LightMapper</Company>
-    <Copyright>Copyright © LightMapper Contributors</Copyright>
+    <Authors>HaloMapper Contributors</Authors>
+    <Company>HaloMapper</Company>
+    <Copyright>Copyright © HaloMapper Contributors</Copyright>
     <PackageProjectUrl>https://github.com/0101coding/lightmapper</PackageProjectUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <RepositoryUrl>https://github.com/0101coding/lightmapper</RepositoryUrl>
