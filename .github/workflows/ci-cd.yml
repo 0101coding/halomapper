@@ -1,0 +1,177 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  release:
+    types: [ published ]
+
+env:
+  DOTNET_VERSION: '8.0.x'
+  
+jobs:
+  test:
+    name: Build and Test
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+        
+    - name: Cache NuGet packages
+      uses: actions/cache@v4
+      with:
+        path: ~/.nuget/packages
+        key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
+        restore-keys: |
+          ${{ runner.os }}-nuget-
+          
+    - name: Restore dependencies
+      run: dotnet restore
+      
+    - name: Build solution
+      run: dotnet build --no-restore --configuration Release
+      
+    - name: Run tests
+      run: dotnet test --no-build --configuration Release --verbosity normal --collect:"XPlat Code Coverage"
+      
+    - name: Upload test results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: test-results
+        path: '**/TestResults/**/*'
+
+  package:
+    name: Create NuGet Packages
+    runs-on: ubuntu-latest
+    needs: test
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.event_name == 'release')
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # Required for GitVersion
+        
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+        
+    - name: Install GitVersion
+      uses: gittools/actions/gitversion/setup@v1.1.1
+      with:
+        versionSpec: '5.x'
+        
+    - name: Determine Version
+      id: gitversion
+      uses: gittools/actions/gitversion/execute@v1.1.1
+      
+    - name: Display Version
+      run: |
+        echo "Version: ${{ steps.gitversion.outputs.semVer }}"
+        echo "AssemblyVersion: ${{ steps.gitversion.outputs.assemblySemVer }}"
+        echo "InformationalVersion: ${{ steps.gitversion.outputs.informationalVersion }}"
+        
+    - name: Restore dependencies
+      run: dotnet restore
+      
+    - name: Build solution
+      run: dotnet build --no-restore --configuration Release
+      
+    - name: Pack NuGet packages
+      run: |
+        dotnet pack src/HaloMapper/HaloMapper.csproj \
+          --no-build \
+          --configuration Release \
+          --output ./artifacts \
+          -p:PackageVersion=${{ steps.gitversion.outputs.semVer }} \
+          -p:AssemblyVersion=${{ steps.gitversion.outputs.assemblySemVer }} \
+          -p:InformationalVersion=${{ steps.gitversion.outputs.informationalVersion }}
+          
+        dotnet pack src/HaloMapper.Extensions.DependencyInjection/HaloMapper.Extensions.DependencyInjection.csproj \
+          --no-build \
+          --configuration Release \
+          --output ./artifacts \
+          -p:PackageVersion=${{ steps.gitversion.outputs.semVer }} \
+          -p:AssemblyVersion=${{ steps.gitversion.outputs.assemblySemVer }} \
+          -p:InformationalVersion=${{ steps.gitversion.outputs.informationalVersion }}
+        
+    - name: Upload NuGet packages
+      uses: actions/upload-artifact@v4
+      with:
+        name: nuget-packages
+        path: ./artifacts/*.nupkg
+
+  publish-nuget:
+    name: Publish to NuGet
+    runs-on: ubuntu-latest
+    needs: package
+    if: github.event_name == 'release' && github.event.action == 'published'
+    environment: production
+    
+    steps:
+    - name: Download NuGet packages
+      uses: actions/download-artifact@v4
+      with:
+        name: nuget-packages
+        path: ./artifacts
+        
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+        
+    - name: Publish to NuGet.org
+      run: |
+        for package in ./artifacts/*.nupkg; do
+          echo "Publishing $package"
+          dotnet nuget push "$package" \
+            --api-key ${{ secrets.NUGET_API_KEY }} \
+            --source https://api.nuget.org/v3/index.json \
+            --skip-duplicate
+        done
+        
+    - name: Create GitHub Release Assets
+      uses: softprops/action-gh-release@v2
+      with:
+        files: ./artifacts/*.nupkg
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  publish-preview:
+    name: Publish Preview to NuGet
+    runs-on: ubuntu-latest
+    needs: package
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    environment: staging
+    
+    steps:
+    - name: Download NuGet packages
+      uses: actions/download-artifact@v4
+      with:
+        name: nuget-packages
+        path: ./artifacts
+        
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+        
+    - name: Publish preview to NuGet.org
+      run: |
+        for package in ./artifacts/*.nupkg; do
+          echo "Publishing preview $package"
+          dotnet nuget push "$package" \
+            --api-key ${{ secrets.NUGET_API_KEY }} \
+            --source https://api.nuget.org/v3/index.json \
+            --skip-duplicate
+        done

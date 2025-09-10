@@ -1,0 +1,41 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    
+    <!-- NuGet Package Properties -->
+    <PackageId>HaloMapper</PackageId>
+    <Version>1.0.0</Version>
+    <Authors>Mayowa Afe-Ogundele</Authors>
+    <Company>HaloMapper</Company>
+    <Product>HaloMapper</Product>
+    <Description>A high-performance, AutoMapper-compatible object mapping library for .NET with advanced features like projection support, flattening, expression compilation, and comprehensive validation.</Description>
+    <PackageTags>mapper;mapping;automapper;object-mapping;projection;flattening;performance;expression-compilation</PackageTags>
+    <!-- GitHub metadata removed to detach from GitHub -->
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageReleaseNotes>
+      v1.0.0 - Initial release with core mapping features:
+      - High-performance expression compilation
+      - AutoMapper-compatible API
+      - Projection support for Entity Framework
+      - Automatic flattening and unflattening
+      - Comprehensive configuration validation
+      - Type converter system
+      - Profile-based configuration
+    </PackageReleaseNotes>
+    
+    <!-- Build Properties -->
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="../../README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
+</Project>

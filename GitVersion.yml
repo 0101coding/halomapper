@@ -1,0 +1,48 @@
+mode: ContinuousDeployment
+branches:
+  main:
+    mode: ContinuousDeployment
+    tag: ''
+    increment: Minor
+    prevent-increment-of-merged-branch-version: true
+    track-merge-target: false
+    source-branches: ['develop', 'feature']
+  develop:
+    mode: ContinuousDeployment
+    tag: 'alpha'
+    increment: Minor
+    prevent-increment-of-merged-branch-version: false
+    track-merge-target: true
+    source-branches: []
+  feature:
+    mode: ContinuousDeployment
+    tag: 'feature'
+    increment: Patch
+    prevent-increment-of-merged-branch-version: true
+    track-merge-target: false
+    source-branches: ['develop']
+  release:
+    mode: ContinuousDeployment
+    tag: 'beta'
+    increment: None
+    prevent-increment-of-merged-branch-version: true
+    track-merge-target: false
+    source-branches: ['develop']
+  hotfix:
+    mode: ContinuousDeployment
+    tag: 'beta'
+    increment: Patch
+    prevent-increment-of-merged-branch-version: false
+    track-merge-target: false
+    source-branches: ['main']
+ignore:
+  sha: []
+merge-message-formats: {}
+major-version-bump-message: '\+semver:\s?(breaking|major)'
+minor-version-bump-message: '\+semver:\s?(feature|minor)'
+patch-version-bump-message: '\+semver:\s?(fix|patch)'
+no-bump-message: '\+semver:\s?(none|skip)'
+legacy-semver-padding: 4
+build-metadata-padding: 4
+commits-since-version-source-padding: 4
+commit-message-incrementing: Enabled

@@ -1,0 +1,41 @@
+<Project>
+  
+  <!-- Shared properties for all projects -->
+  <PropertyGroup>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <WarningsAsErrors />
+    <WarningsNotAsErrors />
+  </PropertyGroup>
+
+  <!-- Package versioning -->
+  <PropertyGroup>
+    <VersionPrefix>1.0.0</VersionPrefix>
+    <VersionSuffix Condition="'$(GITHUB_ACTIONS)' != 'true' AND '$(Configuration)' != 'Release'">dev</VersionSuffix>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <FileVersion>1.0.0.0</FileVersion>
+  </PropertyGroup>
+
+  <!-- Common package metadata -->
+  <PropertyGroup>
+    <Authors>LightMapper Contributors</Authors>
+    <Company>LightMapper</Company>
+    <Copyright>Copyright © LightMapper Contributors</Copyright>
+    <PackageProjectUrl>https://github.com/0101coding/lightmapper</PackageProjectUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <RepositoryUrl>https://github.com/0101coding/lightmapper</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryBranch>main</RepositoryBranch>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+  </PropertyGroup>
+
+  <!-- Source Link support -->
+  <ItemGroup>
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All"/>
+  </ItemGroup>
+
+</Project>
