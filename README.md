@@ -831,7 +831,7 @@ We welcome contributions! Here's how to get started:
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-username/halomapper.git
+git clone https://github.com/0101coding/halomapper.git
 cd halomapper
 
 # Restore dependencies
