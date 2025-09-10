@@ -23,9 +23,9 @@
     <Authors>HaloMapper Contributors</Authors>
     <Company>HaloMapper</Company>
     <Copyright>Copyright © HaloMapper Contributors</Copyright>
-    <PackageProjectUrl>https://github.com/0101coding/lightmapper</PackageProjectUrl>
+    <PackageProjectUrl>https://github.com/0101coding/halomapper</PackageProjectUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <RepositoryUrl>https://github.com/0101coding/lightmapper</RepositoryUrl>
+    <RepositoryUrl>https://github.com/0101coding/halomapper</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <RepositoryBranch>main</RepositoryBranch>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
