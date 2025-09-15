@@ -34,27 +34,45 @@ namespace HaloMapper
         {
             if (source == null) throw new ArgumentNullException(nameof(source));
 
-            var dest = destination ?? _constructor?.Invoke() ?? Activator.CreateInstance(_destinationType)!;
+            // Check for recursion - use a simple depth counter in the mapper context
+            var recursionKey = $"{source.GetType().FullName}->{_destinationType.FullName}";
+            var context = mapper.GetMappingContext();
 
-            _beforeMap?.Invoke(source, dest);
-
-            foreach (var plan in _memberPlans)
+            if (context.IsInRecursion(recursionKey))
             {
-                if (plan.Ignore) continue;
-
-                var value = plan.GetSourceValue(source, mapper);
-                
-                if (value == null && plan.NullSubstitute != null)
-                    value = plan.NullSubstitute;
-
-                if (plan.Condition != null && !plan.Condition(source, dest))
-                    continue;
-
-                plan.SetDestinationValue(dest, value, mapper);
+                // Return default instance to break recursion
+                return destination ?? _constructor?.Invoke() ?? Activator.CreateInstance(_destinationType)!;
             }
 
-            _afterMap?.Invoke(source, dest);
-            return dest;
+            context.EnterMapping(recursionKey);
+            try
+            {
+                var dest = destination ?? _constructor?.Invoke() ?? Activator.CreateInstance(_destinationType)!;
+
+                _beforeMap?.Invoke(source, dest);
+
+                foreach (var plan in _memberPlans)
+                {
+                    if (plan.Ignore) continue;
+
+                    var value = plan.GetSourceValue(source, mapper);
+
+                    if (value == null && plan.NullSubstitute != null)
+                        value = plan.NullSubstitute;
+
+                    if (plan.Condition != null && !plan.Condition(source, dest))
+                        continue;
+
+                    plan.SetDestinationValue(dest, value, mapper);
+                }
+
+                _afterMap?.Invoke(source, dest);
+                return dest;
+            }
+            finally
+            {
+                context.ExitMapping(recursionKey);
+            }
         }
 
         public class FlatteningMemberPlan
