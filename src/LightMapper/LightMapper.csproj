@@ -13,7 +13,9 @@
     <Product>HaloMapper</Product>
     <Description>A high-performance, AutoMapper-compatible object mapping library for .NET with advanced features like projection support, flattening, expression compilation, and comprehensive validation.</Description>
     <PackageTags>mapper;mapping;automapper;object-mapping;projection;flattening;performance;expression-compilation</PackageTags>
-    <!-- GitHub metadata removed to detach from GitHub -->
+    <PackageProjectUrl>https://github.com/0101coding/halomapper</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/0101coding/halomapper</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageReleaseNotes>
