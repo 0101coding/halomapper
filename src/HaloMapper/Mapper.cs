@@ -1,17 +1,37 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
 
 namespace HaloMapper
 {
+    /// <summary>
+    /// Provides object mapping functionality using configured mapping plans.
+    /// </summary>
     public class Mapper : IMapper
     {
-        public MapperConfiguration Configuration { get; }
+    /// <summary>
+    /// Gets the mapping configuration used by this mapper.
+    /// </summary>
+    public MapperConfiguration Configuration { get; }
 
+    private readonly ThreadLocal<MappingContext> _context = new(() => new MappingContext());
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Mapper"/> class with the specified configuration.
+        /// </summary>
+        /// <param name="config">The mapping configuration.</param>
         public Mapper(MapperConfiguration config)
         {
             Configuration = config;
         }
 
+        /// <summary>
+        /// Maps the source object to a new destination object of type <typeparamref name="TDestination"/>.
+        /// </summary>
+        /// <typeparam name="TSource">Source type.</typeparam>
+        /// <typeparam name="TDestination">Destination type.</typeparam>
+        /// <param name="source">The source object to map.</param>
+        /// <returns>The mapped destination object.</returns>
         public TDestination Map<TSource, TDestination>(TSource source)
         {
             if (source == null) throw new ArgumentNullException(nameof(source));
@@ -25,6 +45,14 @@ namespace HaloMapper
             return (TDestination)plan.Map(source!, null, this);
         }
 
+        /// <summary>
+        /// Maps the source object to the provided destination object of type <typeparamref name="TDestination"/>.
+        /// </summary>
+        /// <typeparam name="TSource">Source type.</typeparam>
+        /// <typeparam name="TDestination">Destination type.</typeparam>
+        /// <param name="source">The source object to map.</param>
+        /// <param name="destination">The destination object to populate.</param>
+        /// <returns>The mapped destination object.</returns>
         public TDestination Map<TSource, TDestination>(TSource source, TDestination destination)
         {
             if (source == null) throw new ArgumentNullException(nameof(source));
@@ -38,7 +66,14 @@ namespace HaloMapper
             return (TDestination)plan.Map(source!, destination!, this);
         }
 
-        public IEnumerable<TDestination> MapCollection<TSource, TDestination>(IEnumerable<TSource> source)
+    /// <summary>
+    /// Maps a collection of source objects to a collection of destination objects of type <typeparamref name="TDestination"/>.
+    /// </summary>
+    /// <typeparam name="TSource">Source type.</typeparam>
+    /// <typeparam name="TDestination">Destination type.</typeparam>
+    /// <param name="source">The collection of source objects to map.</param>
+    /// <returns>A collection of mapped destination objects.</returns>
+    public IEnumerable<TDestination> MapCollection<TSource, TDestination>(IEnumerable<TSource> source)
         {
             if (source == null) throw new ArgumentNullException(nameof(source));
 
@@ -46,6 +81,15 @@ namespace HaloMapper
             {
                 yield return Map<TSource, TDestination>(item);
             }
+        }
+
+        /// <summary>
+        /// Gets the mapping context for the current thread.
+        /// </summary>
+        /// <returns>The current mapping context.</returns>
+        internal MappingContext GetMappingContext()
+        {
+            return _context.Value!;
         }
     }
 }

@@ -5,6 +5,9 @@ using System.Reflection;
 
 namespace HaloMapper
 {
+    /// <summary>
+    /// Represents the configuration for mapping between <typeparamref name="TSource"/> and <typeparamref name="TDestination"/>.
+    /// </summary>
     public class MappingExpression<TSource, TDestination>
     {
         private readonly MapperConfiguration? _config;
@@ -15,18 +18,33 @@ namespace HaloMapper
         private readonly ReflectionMapPlan<TSource, TDestination> _reflectionPlan;
         private bool _enableFlattening = true;
 
-        public MappingExpression(ReflectionMapPlan<TSource, TDestination> reflectionPlan)
+    /// <summary>
+    /// Initializes a new instance of <see cref="MappingExpression{TSource, TDestination}"/> with a reflection plan.
+    /// </summary>
+    /// <param name="reflectionPlan">The reflection mapping plan.</param>
+    public MappingExpression(ReflectionMapPlan<TSource, TDestination> reflectionPlan)
         {
             _reflectionPlan = reflectionPlan;
         }
 
-        public MappingExpression(MapperConfiguration config)
+    /// <summary>
+    /// Initializes a new instance of <see cref="MappingExpression{TSource, TDestination}"/> with a mapper configuration.
+    /// </summary>
+    /// <param name="config">The mapper configuration.</param>
+    public MappingExpression(MapperConfiguration config)
         {
             _config = config;
             _reflectionPlan = new ReflectionMapPlan<TSource, TDestination>();
         }
 
-         public MappingExpression<TSource, TDestination> ForMember<TMember>(
+    /// <summary>
+    /// Configures a mapping for a specific member of the destination type.
+    /// </summary>
+    /// <typeparam name="TMember">The member type.</typeparam>
+    /// <param name="destinationMember">Expression selecting the destination member.</param>
+    /// <param name="memberOptions">Options for configuring the member mapping.</param>
+    /// <returns>The mapping expression for chaining.</returns>
+    public MappingExpression<TSource, TDestination> ForMember<TMember>(
         Expression<Func<TDestination, TMember>> destinationMember,
         Action<MemberOptions<TSource, TDestination, TMember>> memberOptions)
     {
@@ -48,6 +66,11 @@ namespace HaloMapper
         return this;
     }
 
+        /// <summary>
+        /// Configures a custom constructor for the destination type.
+        /// </summary>
+        /// <param name="ctor">The constructor function.</param>
+        /// <returns>The mapping expression for chaining.</returns>
         public MappingExpression<TSource, TDestination> ConstructUsing(
             Func<TSource, TDestination> ctor)
         {
@@ -58,6 +81,11 @@ namespace HaloMapper
         }
 
 
+        /// <summary>
+        /// Configures an action to run before mapping.
+        /// </summary>
+        /// <param name="action">The action to run before mapping.</param>
+        /// <returns>The mapping expression for chaining.</returns>
         public MappingExpression<TSource, TDestination> BeforeMap(Action<TSource, TDestination> action)
         {
             _beforeMap = action;
@@ -65,6 +93,11 @@ namespace HaloMapper
             return this;
         }
 
+        /// <summary>
+        /// Configures an action to run after mapping.
+        /// </summary>
+        /// <param name="action">The action to run after mapping.</param>
+        /// <returns>The mapping expression for chaining.</returns>
         public MappingExpression<TSource, TDestination> AfterMap(Action<TSource, TDestination> action)
         {
             _afterMap = action;
@@ -72,12 +105,21 @@ namespace HaloMapper
             return this;
         }
 
+        /// <summary>
+        /// Enables automatic flattening of nested properties during mapping.
+        /// </summary>
+        /// <param name="enable">Whether to enable flattening (default: true).</param>
+        /// <returns>The mapping expression for chaining.</returns>
         public MappingExpression<TSource, TDestination> EnableFlattening(bool enable = true)
         {
             _enableFlattening = enable;
             return this;
         }
 
+        /// <summary>
+        /// Disables automatic flattening of nested properties during mapping.
+        /// </summary>
+        /// <returns>The mapping expression for chaining.</returns>
         public MappingExpression<TSource, TDestination> DisableFlattening()
         {
             return EnableFlattening(false);
@@ -168,6 +210,13 @@ namespace HaloMapper
                 afterMap
             );
         }
+        /// <summary>
+        /// Gets the name of the member selected by the expression.
+        /// </summary>
+        /// <typeparam name="TDest">Destination type.</typeparam>
+        /// <typeparam name="TMember">Member type.</typeparam>
+        /// <param name="destinationMember">Expression selecting the member.</param>
+        /// <returns>The name of the member.</returns>
         public static string GetMemberName<TDest, TMember>(
              Expression<Func<TDest, TMember>> destinationMember)
         {
@@ -198,42 +247,66 @@ namespace HaloMapper
                     $"Expression '{destinationMember}' does not refer to a valid property or field.");
 
             return string.Join(".", names);
-
-
         }
 
     }
     
+    /// <summary>
+    /// Provides options for configuring member mappings in a mapping expression.
+    /// </summary>
     public class MemberOptions<TSource, TDestination, TMember> : IMemberOptions<TSource, TDestination, TMember>
     {
         private readonly ReflectionMapPlan.MemberPlan _plan;
 
-        public MemberOptions(ReflectionMapPlan.MemberPlan plan)
+    /// <summary>
+    /// Initializes a new instance of <see cref="MemberOptions{TSource, TDestination, TMember}"/>.
+    /// </summary>
+    /// <param name="plan">The member plan to configure.</param>
+    public MemberOptions(ReflectionMapPlan.MemberPlan plan)
         {
             _plan = plan;
         }
 
-        public void MapFrom(Func<TSource, TMember> mapFunc)
+    /// <summary>
+    /// Configures the member to be mapped from the specified function.
+    /// </summary>
+    /// <param name="mapFunc">The mapping function.</param>
+    public void MapFrom(Func<TSource, TMember> mapFunc)
         {
             _plan.SourceGetter = s => (object?)mapFunc((TSource)s);
         }
 
-        public void Ignore()
+    /// <summary>
+    /// Ignores the member during mapping.
+    /// </summary>
+    public void Ignore()
         {
             _plan.Ignore = true;
         }
 
-        public void Condition(Func<TSource, TDestination, bool> predicate)
+    /// <summary>
+    /// Configures a condition for mapping the member.
+    /// </summary>
+    /// <param name="predicate">The condition predicate.</param>
+    public void Condition(Func<TSource, TDestination, bool> predicate)
         {
             _plan.Condition = (s, d) => predicate((TSource)s, (TDestination)d);
         }
 
-        public void NullSubstitute(TMember value)
+    /// <summary>
+    /// Configures a substitute value to use if the source value is null.
+    /// </summary>
+    /// <param name="value">The substitute value.</param>
+    public void NullSubstitute(TMember value)
         {
             _plan.NullSubstitute = value;
         }
 
-        public void ResolveUsing(Func<TSource, TDestination, object?> resolver)
+    /// <summary>
+    /// Configures a custom resolver for the member.
+    /// </summary>
+    /// <param name="resolver">The resolver function.</param>
+    public void ResolveUsing(Func<TSource, TDestination, object?> resolver)
         {
             _plan.Resolver = (s, d) => resolver((TSource)s, (TDestination)d);
         }
