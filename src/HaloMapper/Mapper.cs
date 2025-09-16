@@ -84,6 +84,29 @@ namespace HaloMapper
         }
 
         /// <summary>
+        /// Maps an object to the specified destination type.
+        /// </summary>
+        /// <param name="source">The source object to map.</param>
+        /// <param name="destinationType">The destination type.</param>
+        /// <returns>The mapped destination object.</returns>
+        public object Map(object source, Type destinationType)
+        {
+            if (source == null) throw new ArgumentNullException(nameof(source));
+
+            var sourceType = source.GetType();
+
+            if (!Configuration.TryGetPlan(sourceType, destinationType, out var plan))
+            {
+                // Try to create plan using reflection
+                var ensureMethod = typeof(MapperConfiguration).GetMethod("EnsurePlan")!.MakeGenericMethod(sourceType, destinationType);
+                ensureMethod.Invoke(Configuration, null);
+                plan = Configuration._plans[(sourceType, destinationType)];
+            }
+
+            return plan.Map(source, null, this);
+        }
+
+        /// <summary>
         /// Gets the mapping context for the current thread.
         /// </summary>
         /// <returns>The current mapping context.</returns>
