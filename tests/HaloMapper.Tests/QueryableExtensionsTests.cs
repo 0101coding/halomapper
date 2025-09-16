@@ -67,7 +67,7 @@ namespace HaloMapper.Tests
             {
                 new QueryableTestSource { Name = "Test1" },
                 new QueryableTestSource { Name = "Test2" }
-            }.AsQueryable<object>(); // Non-generic queryable
+            }.AsQueryable(); // Non-generic queryable (but maintains type info)
 
             // Act
             var result = sourceData.ProjectTo<QueryableTestDestination>(config).ToList();

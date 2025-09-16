@@ -201,6 +201,7 @@ namespace HaloMapper.Tests
             {
                 cfg.ForMember(dest => dest.TotalAmount, opt => opt.MapFrom(src => src.Items.Sum(i => i.Price * i.Quantity)));
                 cfg.ForMember(dest => dest.ItemCount, opt => opt.MapFrom(src => src.Items.Count));
+                cfg.ForMember(dest => dest.Status, opt => opt.MapFrom(src => Enum.TryParse<IntegrationStatus>(src.StatusString, true, out var result) ? result : IntegrationStatus.Pending));
             });
             config.CreateMap<IntegrationOrderItem, IntegrationOrderItemDto>();
 
@@ -260,7 +261,7 @@ namespace HaloMapper.Tests
 
             // Verify calculated fields
             Assert.Equal(3, result.ItemCount);
-            Assert.Equal(194.48m, result.TotalAmount); // 29.99*2 + 15.50*1 + 45.00*3
+            Assert.Equal(210.48m, result.TotalAmount); // 29.99*2 + 15.50*1 + 45.00*3 = 59.98 + 15.50 + 135.00
 
             // Verify items collection
             Assert.Equal(3, result.Items.Count);

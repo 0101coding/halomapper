@@ -110,6 +110,37 @@ namespace HaloMapper
                         {
                             value = convertedValue;
                         }
+                        // Handle collections
+                        else if (value is System.Collections.IEnumerable sourceCollection &&
+                                 DestinationType.IsGenericType &&
+                                 DestinationType.GetGenericTypeDefinition() == typeof(List<>))
+                        {
+                            var destElementType = DestinationType.GetGenericArguments()[0];
+                            var destListType = typeof(List<>).MakeGenericType(destElementType);
+                            var destList = Activator.CreateInstance(destListType) as System.Collections.IList;
+
+                            foreach (var item in sourceCollection)
+                            {
+                                if (item != null)
+                                {
+                                    object? mappedItem = null;
+                                    if (item.GetType() == destElementType)
+                                    {
+                                        mappedItem = item;
+                                    }
+                                    else if (mapper.Configuration.TryGetPlan(item.GetType(), destElementType, out var itemPlan))
+                                    {
+                                        mappedItem = itemPlan.Map(item, null, mapper);
+                                    }
+                                    else
+                                    {
+                                        mappedItem = mapper.Map(item, destElementType);
+                                    }
+                                    destList?.Add(mappedItem);
+                                }
+                            }
+                            value = destList;
+                        }
                         else if (mapper.Configuration.TryGetPlan(value.GetType(), DestinationType, out var plan))
                         {
                             value = plan.Map(value, null, mapper);
