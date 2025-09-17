@@ -23,11 +23,29 @@ namespace HaloMapper
         public object Map(object source, object? destination, Mapper mapper)
         {
             if (source == null) throw new ArgumentNullException(nameof(source));
-            
-            var typedSource = (TSource)source;
-            var typedDestination = destination != null ? (TDestination)destination : default(TDestination)!;
-            
-            return _compiledMapper(typedSource, typedDestination, mapper)!;
+
+            // Check for recursion
+            var recursionKey = $"{_sourceType.FullName}->{_destinationType.FullName}";
+            var context = mapper.GetMappingContext();
+
+            if (context.IsInRecursion(recursionKey))
+            {
+                // Return default instance to break recursion
+                return destination ?? default(TDestination)!;
+            }
+
+            context.EnterMapping(recursionKey);
+            try
+            {
+                var typedSource = (TSource)source;
+                var typedDestination = destination != null ? (TDestination)destination : default(TDestination)!;
+
+                return _compiledMapper(typedSource, typedDestination, mapper)!;
+            }
+            finally
+            {
+                context.ExitMapping(recursionKey);
+            }
         }
 
         private Func<TSource, TDestination, Mapper, TDestination> BuildCompiledExpression(

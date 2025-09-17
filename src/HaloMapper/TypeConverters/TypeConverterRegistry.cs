@@ -66,8 +66,16 @@ namespace HaloMapper.TypeConverters
             // Try registered converters
             if (TryGetConverter(sourceType, destinationType, out var converter))
             {
-                var convertMethod = converter!.GetType().GetMethod("Convert");
-                return convertMethod?.Invoke(converter, new[] { source });
+                try
+                {
+                    var convertMethod = converter!.GetType().GetMethod("Convert");
+                    return convertMethod?.Invoke(converter, new[] { source });
+                }
+                catch
+                {
+                    // If conversion fails, return null
+                    return null;
+                }
             }
 
             // Try built-in conversions

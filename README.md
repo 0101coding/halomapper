@@ -820,12 +820,12 @@ private static List<string> GetUserPermissions(User user)
 We welcome contributions! Here's how to get started:
 
 1. **Fork** the repository
-2. **Create** a feature branch: `git checkout -b feature/amazing-feature`
-3. **Add** tests for your changes
-4. **Ensure** all tests pass: `dotnet test`
-5. **Commit** your changes: `git commit -m 'Add amazing feature'`
-6. **Push** to the branch: `git push origin feature/amazing-feature`
-7. **Open** a Pull Request
+2. **Clone** your fork: `git clone https://github.com/<your-username>/halomapper.git`
+3. **Create** a new branch: `git checkout -b feature/my-new-feature`
+4. **Make** your changes and add tests
+5. **Commit** your changes: `git commit -m "Describe your changes"`
+6. **Push** to your fork: `git push origin feature/my-new-feature`
+7. **Open** a Pull Request on GitHub
 
 ### Development Setup
 
@@ -845,11 +845,8 @@ dotnet build
 ```
 
 ## Support 💬
-
-- 📖 **Documentation**: [Full documentation](./docs/)
-- 🐛 **Bug Reports**: [GitHub Issues](https://github.com/0101coding/halomapper/issues)
-- 💡 **Feature Requests**: [GitHub Discussions](https://github.com/0101coding/halomapper/discussions)
-- ❓ **Questions**: [Stack Overflow](https://stackoverflow.com/questions/tagged/halomapper)
+ 
+- 🐛 **Bug Reports**: [GitHub Issues](https://github.com/0101coding/halomapper/issues)  
 
 ## Roadmap 🗺️
 

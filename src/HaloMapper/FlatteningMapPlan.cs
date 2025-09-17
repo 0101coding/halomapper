@@ -34,27 +34,45 @@ namespace HaloMapper
         {
             if (source == null) throw new ArgumentNullException(nameof(source));
 
-            var dest = destination ?? _constructor?.Invoke() ?? Activator.CreateInstance(_destinationType)!;
+            // Check for recursion - use a simple depth counter in the mapper context
+            var recursionKey = $"{source.GetType().FullName}->{_destinationType.FullName}";
+            var context = mapper.GetMappingContext();
 
-            _beforeMap?.Invoke(source, dest);
-
-            foreach (var plan in _memberPlans)
+            if (context.IsInRecursion(recursionKey))
             {
-                if (plan.Ignore) continue;
-
-                var value = plan.GetSourceValue(source, mapper);
-                
-                if (value == null && plan.NullSubstitute != null)
-                    value = plan.NullSubstitute;
-
-                if (plan.Condition != null && !plan.Condition(source, dest))
-                    continue;
-
-                plan.SetDestinationValue(dest, value, mapper);
+                // Return default instance to break recursion
+                return destination ?? _constructor?.Invoke() ?? Activator.CreateInstance(_destinationType)!;
             }
 
-            _afterMap?.Invoke(source, dest);
-            return dest;
+            context.EnterMapping(recursionKey);
+            try
+            {
+                var dest = destination ?? _constructor?.Invoke() ?? Activator.CreateInstance(_destinationType)!;
+
+                _beforeMap?.Invoke(source, dest);
+
+                foreach (var plan in _memberPlans)
+                {
+                    if (plan.Ignore) continue;
+
+                    var value = plan.GetSourceValue(source, mapper);
+
+                    if (value == null && plan.NullSubstitute != null)
+                        value = plan.NullSubstitute;
+
+                    if (plan.Condition != null && !plan.Condition(source, dest))
+                        continue;
+
+                    plan.SetDestinationValue(dest, value, mapper);
+                }
+
+                _afterMap?.Invoke(source, dest);
+                return dest;
+            }
+            finally
+            {
+                context.ExitMapping(recursionKey);
+            }
         }
 
         public class FlatteningMemberPlan
@@ -91,6 +109,37 @@ namespace HaloMapper
                         if (convertedValue != null)
                         {
                             value = convertedValue;
+                        }
+                        // Handle collections
+                        else if (value is System.Collections.IEnumerable sourceCollection &&
+                                 DestinationType.IsGenericType &&
+                                 DestinationType.GetGenericTypeDefinition() == typeof(List<>))
+                        {
+                            var destElementType = DestinationType.GetGenericArguments()[0];
+                            var destListType = typeof(List<>).MakeGenericType(destElementType);
+                            var destList = Activator.CreateInstance(destListType) as System.Collections.IList;
+
+                            foreach (var item in sourceCollection)
+                            {
+                                if (item != null)
+                                {
+                                    object? mappedItem = null;
+                                    if (item.GetType() == destElementType)
+                                    {
+                                        mappedItem = item;
+                                    }
+                                    else if (mapper.Configuration.TryGetPlan(item.GetType(), destElementType, out var itemPlan))
+                                    {
+                                        mappedItem = itemPlan.Map(item, null, mapper);
+                                    }
+                                    else
+                                    {
+                                        mappedItem = mapper.Map(item, destElementType);
+                                    }
+                                    destList?.Add(mappedItem);
+                                }
+                            }
+                            value = destList;
                         }
                         else if (mapper.Configuration.TryGetPlan(value.GetType(), DestinationType, out var plan))
                         {
